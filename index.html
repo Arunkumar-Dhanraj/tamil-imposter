@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7B32B">
+<meta name="description" content="நண்பர்களுடன் ஒரே கைப்பேசியில் விளையாடும் தமிழ் இம்போஸ்டர் விளையாட்டு">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>இம்போஸ்டர் | தமிழ் விளையாட்டு</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Thambi+2:wght@600;800&family=Noto+Sans+Tamil:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --marigold: #F7B32B;
+    --marigold-deep: #E39B0B;
+    --ink: #221338;
+    --ink-deep: #140A24;
+    --jasmine: #FFF8E7;
+    --peacock: #0B7A75;
+    --peacock-deep: #075955;
+    --kumkum: #D62839;
+    --kumkum-deep: #A3172A;
+    --muted: #5B4A6E;
+    --display: "Baloo Thambi 2", "Noto Sans Tamil", "Tamil Sangam MN", "Tamil MN", "Nirmala UI", "Latha", sans-serif;
+    --body: "Noto Sans Tamil", "Tamil Sangam MN", "Tamil MN", "Nirmala UI", "Latha", system-ui, sans-serif;
+    --radius-lg: 22px;
+    --radius-md: 14px;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    font-family: var(--body);
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--ink);
+    background-color: var(--marigold);
+    background-image: radial-gradient(circle, rgba(34, 19, 56, .14) 1.6px, transparent 2.2px);
+    background-size: 22px 22px;
+    transition: background-color .35s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* "Pass the phone" mode: dark, so the handoff moment feels different and private */
+  body.private {
+    background-color: var(--ink);
+    background-image: radial-gradient(circle, rgba(247, 179, 43, .10) 1.6px, transparent 2.2px);
+    color: var(--jasmine);
+  }
+
+  button, input { font: inherit; color: inherit; }
+  button { touch-action: manipulation; cursor: pointer; }
+
+  .app {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    padding: max(16px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; animation: screen-in .35s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes screen-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  h1, h2, h3 { font-family: var(--display); margin: 0; line-height: 1.25; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: block;
+    width: 100%;
+    min-height: 60px;
+    padding: 12px 20px;
+    border: 3px solid var(--ink);
+    border-radius: 999px;
+    background: var(--jasmine);
+    color: var(--ink);
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 21px;
+    line-height: 1.35;
+    text-align: center;
+    box-shadow: 0 5px 0 var(--ink);
+    transition: transform .08s ease, box-shadow .08s ease, opacity .2s ease;
+  }
+  .btn:active:not(:disabled) { transform: translateY(4px); box-shadow: 0 1px 0 var(--ink); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn:focus-visible, .chip:focus-visible, .step-btn:focus-visible, .seg button:focus-visible,
+  .vote-btn:focus-visible, .icon-btn:focus-visible, input:focus-visible, summary:focus-visible, .link-btn:focus-visible {
+    outline: 3px solid var(--peacock);
+    outline-offset: 3px;
+  }
+  .btn.primary { background: var(--ink); color: var(--jasmine); box-shadow: 0 5px 0 var(--ink-deep); }
+  .btn.primary:active:not(:disabled) { box-shadow: 0 1px 0 var(--ink-deep); }
+  .btn.go { background: var(--marigold); color: var(--ink); border-color: var(--marigold); box-shadow: 0 5px 0 var(--marigold-deep); }
+  .btn.go:active:not(:disabled) { box-shadow: 0 1px 0 var(--marigold-deep); }
+  .btn.ghost-dark { background: transparent; color: var(--jasmine); border-color: var(--jasmine); box-shadow: 0 5px 0 rgba(255, 248, 231, .35); }
+  .btn + .btn { margin-top: 16px; }
+
+  .link-btn {
+    display: block;
+    margin: 18px auto 0;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  /* ---------- Setup ---------- */
+  .hero { text-align: center; padding: 8px 0 18px; }
+  .kolam { width: 92px; height: 92px; display: block; margin: 0 auto 4px; }
+  .hero h1 {
+    font-size: clamp(44px, 13vw, 60px);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--ink);
+    text-shadow: 3px 3px 0 var(--jasmine);
+  }
+  .hero p { margin: 6px auto 0; max-width: 30ch; font-weight: 600; font-size: 17px; }
+
+  .panel {
+    background: var(--jasmine);
+    border: 3px solid var(--ink);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 6px 0 var(--ink);
+    padding: 18px 16px 20px;
+    margin-bottom: 22px;
+  }
+  .panel h2 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .panel .hint { margin: 0 0 12px; font-size: 15px; color: var(--muted); }
+
+  .stepper { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+  .step-btn {
+    width: 60px; height: 60px; flex: none;
+    border-radius: 50%;
+    border: 3px solid var(--ink);
+    background: var(--marigold);
+    font-size: 32px; font-weight: 700; line-height: 1;
+    box-shadow: 0 4px 0 var(--ink);
+  }
+  .step-btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+  .step-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .step-value { text-align: center; }
+  .step-value strong { display: block; font-family: var(--display); font-size: 46px; line-height: 1.1; }
+  .step-value span { font-size: 15px; color: var(--muted); }
+
+  .names { display: grid; gap: 10px; margin-top: 16px; }
+  .name-row { display: flex; align-items: center; gap: 10px; }
+  .name-row label {
+    flex: none; width: 36px; height: 36px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--ink); color: var(--jasmine);
+    font-weight: 700; font-size: 16px;
+  }
+  .name-row input {
+    flex: 1 1 0; min-width: 0; width: 100%;
+    height: 52px;
+    padding: 0 14px;
+    border: 2.5px solid var(--ink);
+    border-radius: var(--radius-md);
+    background: #fff;
+    font-size: 18px;
+  }
+  .name-row input::placeholder { color: #9A8BA8; }
+  .name-row input.invalid { border-color: var(--kumkum); background: #FFECEE; }
+
+  .chips { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .chip {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    min-width: 0;
+    min-height: 72px;
+    padding: 8px 6px;
+    border: 2.5px solid var(--ink);
+    border-radius: var(--radius-md);
+    background: #fff;
+    font-weight: 600; font-size: 15px; line-height: 1.35;
+    text-align: center;
+  }
+  .fit { display: block; max-width: 100%; white-space: nowrap; }
+  .chip.mixed .fit { white-space: normal; }
+  .chip .emoji { font-size: 24px; flex: none; }
+  .chip[aria-pressed="true"] { background: var(--ink); color: var(--jasmine); box-shadow: 0 4px 0 var(--peacock); }
+  .chip.mixed { grid-column: 1 / -1; flex-direction: row; gap: 8px; min-height: 56px; }
+
+  .seg { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .seg button {
+    min-width: 0;
+    min-height: 64px;
+    padding: 8px 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border: 2.5px solid var(--ink);
+    border-radius: var(--radius-md);
+    background: #fff;
+    font-family: var(--display); font-weight: 800; font-size: 20px; line-height: 1.3;
+  }
+  .seg button b { font-size: 30px; line-height: 1.1; }
+  .seg button span { font-size: 16px; line-height: 1.35; }
+  .seg button[aria-pressed="true"] { background: var(--kumkum); color: #fff; border-color: var(--kumkum-deep); box-shadow: 0 4px 0 var(--kumkum-deep); }
+  .seg button:disabled { opacity: .4; cursor: not-allowed; }
+  .note { margin: 12px 0 0; font-size: 15px; color: var(--muted); }
+  .note:empty { display: none; }
+
+  .error {
+    margin: 0 0 16px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--kumkum); color: #fff;
+    font-weight: 600; font-size: 16px;
+  }
+  .error:empty { display: none; }
+
+  details.howto {
+    margin-top: 26px;
+    background: rgba(255, 248, 231, .55);
+    border: 2.5px dashed var(--ink);
+    border-radius: var(--radius-lg);
+    padding: 4px 16px;
+  }
+  details.howto summary { padding: 12px 0; font-weight: 700; font-size: 18px; cursor: pointer; }
+  details.howto ol { margin: 0 0 14px; padding-left: 22px; }
+  details.howto li { margin-bottom: 8px; }
+
+  /* ---------- In-game top bar ---------- */
+  .topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 48px; margin-bottom: 18px; }
+  .progress { display: flex; gap: 6px; flex-wrap: wrap; }
+  .progress i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid currentColor; opacity: .55; }
+  .progress i.done { background: currentColor; opacity: .55; }
+  .progress i.now { background: var(--marigold); border-color: var(--marigold); opacity: 1; transform: scale(1.25); }
+  .icon-btn {
+    width: 48px; height: 48px; flex: none;
+    border-radius: 50%;
+    border: 2.5px solid currentColor;
+    background: transparent;
+    font-size: 22px; line-height: 1;
+  }
+
+  /* ---------- Handoff ---------- */
+  .handoff { text-align: center; padding-top: 6vh; }
+  .handoff .lead { font-size: 18px; margin: 0; opacity: .85; }
+  .handoff .who {
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: clamp(42px, 13vw, 64px);
+    line-height: 1.2;
+    color: var(--marigold);
+    margin: 12px 0 18px;
+    overflow-wrap: anywhere;
+  }
+  .handoff .warn {
+    display: inline-block;
+    margin: 0 0 40px;
+    padding: 10px 16px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 248, 231, .08);
+    border: 1.5px solid rgba(255, 248, 231, .25);
+    font-size: 16px;
+  }
+  .handoff .done-note { margin: 0 0 18px; color: #8FE3D2; font-weight: 600; font-size: 15px; }
+  .handoff .done-note:empty { display: none; }
+
+  /* ---------- Reveal ---------- */
+  .reveal-name { text-align: center; font-size: 30px; font-weight: 800; color: var(--marigold); margin-bottom: 18px; overflow-wrap: anywhere; }
+  .card {
+    position: relative;
+    min-height: 340px;
+    border-radius: 28px;
+    border: 3px solid var(--jasmine);
+    padding: 28px 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center;
+    margin-bottom: 28px;
+    user-select: none; -webkit-user-select: none;
+    perspective: 900px;
+  }
+  .card.covered {
+    background-color: var(--jasmine);
+    color: var(--ink);
+    background-image: radial-gradient(circle, rgba(34, 19, 56, .18) 2px, transparent 2.6px);
+    background-size: 26px 26px;
+  }
+  .card.covered .q {
+    width: 120px; height: 120px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--ink); color: var(--marigold);
+    font-family: var(--display); font-size: 72px; font-weight: 800; line-height: 1;
+    margin-bottom: 18px;
+  }
+  .card.covered p { margin: 0; font-weight: 600; max-width: 26ch; background: var(--jasmine); padding: 4px 8px; border-radius: 8px; }
+
+  .card.normal { background: var(--peacock); border-color: #8FE3D2; color: #fff; box-shadow: 0 8px 0 var(--peacock-deep); }
+  .card.imposter { background: var(--kumkum); border-color: #FFB3BC; color: #fff; box-shadow: 0 8px 0 var(--kumkum-deep); }
+  .card.flip { animation: flip-in .45s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes flip-in {
+    from { transform: rotateY(85deg) scale(.92); opacity: .3; }
+    to { transform: none; opacity: 1; }
+  }
+  .card .small { margin: 0; font-size: 16px; opacity: .9; }
+  .card .word {
+    width: 100%;
+    font-family: var(--display);
+    font-weight: 800;
+    font-size: 60px;
+    line-height: 1.25;
+    margin: 10px 0 14px;
+  }
+  .card .badge {
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, .18);
+    font-size: 15px; font-weight: 600;
+  }
+  .card .mask { font-size: 64px; line-height: 1; margin-bottom: 6px; }
+
+  .card .tip { margin: 16px 0 0; font-size: 15px; max-width: 30ch; opacity: .95; }
+
+  /* ---------- Discussion / vote / result ---------- */
+  .stage-title { text-align: center; margin: 4px 0 18px; }
+  .stage-title .big-emoji { font-size: 54px; line-height: 1; display: block; margin-bottom: 6px; }
+  .stage-title h2 { font-size: clamp(27px, 8vw, 34px); font-weight: 800; }
+  .stage-title p { margin: 6px auto 0; font-weight: 600; max-width: 32ch; }
+
+  .rules { margin: 0; padding-left: 22px; }
+  .rules li { margin-bottom: 10px; }
+  .rules li:last-child { margin-bottom: 0; }
+
+  .order { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .order li {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px 12px;
+    border-radius: var(--radius-md);
+    background: #fff;
+    border: 2px solid rgba(34, 19, 56, .15);
+    font-weight: 600; font-size: 18px;
+    overflow-wrap: anywhere;
+  }
+  .order li b {
+    flex: none; width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center;
+    background: var(--marigold); font-size: 15px;
+  }
+  .order li.first { border-color: var(--ink); background: var(--marigold); }
+  .order li.first b { background: var(--ink); color: var(--jasmine); }
+  .order li small { margin-left: auto; font-size: 14px; font-weight: 600; flex: none; }
+
+  .vote-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .vote-btn {
+    min-height: 64px;
+    padding: 10px;
+    border: 2.5px solid var(--ink);
+    border-radius: var(--radius-md);
+    background: #fff;
+    font-weight: 700; font-size: 18px; line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+  .vote-btn[aria-pressed="true"] { background: var(--ink); color: var(--jasmine); box-shadow: 0 4px 0 var(--kumkum); }
+  .vote-btn[aria-pressed="true"]::before { content: "👉 "; }
+
+  .result-hero {
+    text-align: center;
+    border-radius: 28px;
+    border: 3px solid var(--ink);
+    padding: 22px 18px;
+    margin-bottom: 22px;
+    color: #fff;
+    animation: pop .5s cubic-bezier(.2, 1.4, .4, 1);
+  }
+  .result-hero.crew { background: var(--peacock); box-shadow: 0 7px 0 var(--peacock-deep); }
+  .result-hero.imp { background: var(--kumkum); box-shadow: 0 7px 0 var(--kumkum-deep); }
+  .result-hero.neutral { background: var(--ink); box-shadow: 0 7px 0 var(--ink-deep); }
+  @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: none; opacity: 1; } }
+  .result-hero .big-emoji { font-size: 56px; line-height: 1; display: block; }
+  .result-hero h2 { font-size: clamp(30px, 9vw, 40px); font-weight: 800; margin-top: 6px; }
+  .result-hero p { margin: 6px 0 0; font-weight: 600; }
+
+  .reveal-row { text-align: center; }
+  .reveal-row .label { margin: 0; font-size: 16px; color: var(--muted); font-weight: 600; }
+  .reveal-row .secret { font-family: var(--display); font-weight: 800; font-size: 52px; line-height: 1.25; color: var(--peacock); }
+  .reveal-row .cat { font-size: 15px; color: var(--muted); }
+  .imp-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
+  .imp-list span {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: var(--kumkum); color: #fff;
+    font-weight: 700; font-size: 19px;
+    overflow-wrap: anywhere;
+  }
+  .divider { height: 0; border-top: 2.5px dashed rgba(34, 19, 56, .3); margin: 18px 0; }
+  .vote-summary { margin: 0; font-size: 16px; text-align: center; }
+  .last-chance {
+    margin: 0 0 22px;
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    background: var(--jasmine);
+    border: 2.5px dashed var(--ink);
+    font-size: 15px; font-weight: 600;
+  }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  @media (min-width: 440px) {
+    .chips { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  @media (max-width: 340px) {
+    .chips { grid-template-columns: minmax(0, 1fr); }
+    .chip { flex-direction: row; gap: 10px; min-height: 56px; }
+    .hero h1 { font-size: 40px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+
+  <!-- ================= SETUP ================= -->
+  <section class="screen active" id="screen-setup" aria-labelledby="title">
+    <header class="hero">
+      <svg class="kolam" viewBox="0 0 100 100" aria-hidden="true">
+        <g fill="none" stroke="#221338" stroke-width="3.2" stroke-linecap="round">
+          <rect x="27" y="27" width="46" height="46" rx="14" transform="rotate(45 50 50)"/>
+          <path d="M50 8 C62 20 62 30 50 36 C38 30 38 20 50 8Z"/>
+          <path d="M50 92 C62 80 62 70 50 64 C38 70 38 80 50 92Z"/>
+          <path d="M8 50 C20 38 30 38 36 50 C30 62 20 62 8 50Z"/>
+          <path d="M92 50 C80 38 70 38 64 50 C70 62 80 62 92 50Z"/>
+        </g>
+        <g fill="#221338">
+          <circle cx="50" cy="50" r="4.5"/>
+          <circle cx="50" cy="22" r="3"/><circle cx="50" cy="78" r="3"/>
+          <circle cx="22" cy="50" r="3"/><circle cx="78" cy="50" r="3"/>
+          <circle cx="30" cy="30" r="3"/><circle cx="70" cy="30" r="3"/>
+          <circle cx="30" cy="70" r="3"/><circle cx="70" cy="70" r="3"/>
+        </g>
+        <circle cx="50" cy="50" r="2" fill="#D62839"/>
+      </svg>
+      <h1 id="title">இம்போஸ்டர்</h1>
+      <p>எல்லோருக்கும் ஒரே ரகசிய வார்த்தை. ஒருவருக்கு மட்டும் தெரியாது!</p>
+    </header>
+
+    <div class="panel">
+      <h2 id="lbl-count">வீரர்கள்</h2>
+      <div class="stepper" role="group" aria-labelledby="lbl-count">
+        <button class="step-btn" id="count-minus" type="button" aria-label="ஒரு வீரரைக் குறை">−</button>
+        <div class="step-value" aria-live="polite">
+          <strong id="count-value">5</strong>
+          <span>பேர் (3 முதல் 10 வரை)</span>
+        </div>
+        <button class="step-btn" id="count-plus" type="button" aria-label="ஒரு வீரரைச் சேர்">+</button>
+      </div>
+      <div class="names" id="names"></div>
+    </div>
+
+    <div class="panel">
+      <h2>வகை</h2>
+      <p class="hint">எந்த வகையிலிருந்து ரகசிய வார்த்தை வர வேண்டும்?</p>
+      <div class="chips" id="chips" role="group" aria-label="வகை"></div>
+    </div>
+
+    <div class="panel">
+      <h2>இம்போஸ்டர்கள்</h2>
+      <p class="hint">இவர்களுக்கு மட்டும் ரகசிய வார்த்தை தெரியாது.</p>
+      <div class="seg" role="group" aria-label="இம்போஸ்டர்களின் எண்ணிக்கை">
+        <button type="button" id="imp-1" aria-pressed="true"><b>1</b><span class="fit">இம்போஸ்டர்</span></button>
+        <button type="button" id="imp-2" aria-pressed="false"><b>2</b><span class="fit">இம்போஸ்டர்கள்</span></button>
+      </div>
+      <p class="note" id="imp-note" aria-live="polite"></p>
+    </div>
+
+    <p class="error" id="setup-error" role="alert"></p>
+    <button class="btn primary" id="start-btn" type="button">விளையாட்டைத் தொடங்கு</button>
+
+    <details class="howto">
+      <summary>விளையாடுவது எப்படி?</summary>
+      <ol>
+        <li>வீரர்களின் பெயர்களை உள்ளிட்டு, ஒரு வகையைத் தேர்ந்தெடுங்கள்.</li>
+        <li>கைப்பேசியை ஒவ்வொருவரிடமும் மாற்றி மாற்றிக் கொடுங்கள். ஒவ்வொருவரும் தங்கள் வார்த்தையைத் தனியாகப் பாருங்கள்.</li>
+        <li>இம்போஸ்டருக்கு மட்டும் வார்த்தை தெரியாது. மற்ற அனைவருக்கும் ஒரே வார்த்தை.</li>
+        <li>வரிசையாக ஒவ்வொருவரும் அந்த வார்த்தையைப் பற்றி ஒரு குறிப்பு சொல்லுங்கள். வார்த்தையை நேரடியாகச் சொல்லக்கூடாது!</li>
+        <li>விவாதித்து, இம்போஸ்டர் யார் என்று வாக்களியுங்கள். பிடிபட்ட இம்போஸ்டர் வார்த்தையைச் சரியாக ஊகித்தால், இம்போஸ்டருக்கே வெற்றி!</li>
+      </ol>
+    </details>
+  </section>
+
+  <!-- ================= HANDOFF (confirmation between players) ================= -->
+  <section class="screen" id="screen-handoff" aria-live="polite">
+    <div class="topbar">
+      <div class="progress" id="handoff-progress" aria-hidden="true"></div>
+      <button class="icon-btn quit-btn" type="button" aria-label="ஆட்டத்தை நிறுத்து">✕</button>
+    </div>
+    <div class="handoff">
+      <p class="done-note" id="handoff-done"></p>
+      <p class="lead">கைப்பேசியை இவரிடம் கொடுங்கள்</p>
+      <h2 class="who" id="handoff-name"></h2>
+      <p class="warn">🙈 மற்றவர்கள் திரையைப் பார்க்க வேண்டாம்!</p>
+      <button class="btn go" id="handoff-btn" type="button"></button>
+    </div>
+  </section>
+
+  <!-- ================= REVEAL ================= -->
+  <section class="screen" id="screen-reveal">
+    <div class="topbar">
+      <div class="progress" id="reveal-progress" aria-hidden="true"></div>
+      <button class="icon-btn quit-btn" type="button" aria-label="ஆட்டத்தை நிறுத்து">✕</button>
+    </div>
+    <h2 class="reveal-name" id="reveal-name"></h2>
+    <div class="card covered" id="card" aria-live="polite"></div>
+    <button class="btn go" id="show-btn" type="button">என் வார்த்தையைக் காட்டு</button>
+    <button class="btn ghost-dark" id="hide-btn" type="button" hidden>வார்த்தையை மறை</button>
+  </section>
+
+  <!-- ================= DISCUSSION ================= -->
+  <section class="screen" id="screen-discuss">
+    <div class="topbar">
+      <span></span>
+      <button class="icon-btn quit-btn" type="button" aria-label="ஆட்டத்தை நிறுத்து">✕</button>
+    </div>
+    <div class="stage-title">
+      <span class="big-emoji" aria-hidden="true">🎭</span>
+      <h2>அனைவருக்கும் பங்கு கிடைத்துவிட்டது!</h2>
+      <p>இப்போது குறிப்புகள் சொல்லி, இம்போஸ்டரைக் கண்டுபிடியுங்கள்.</p>
+    </div>
+
+    <div class="panel">
+      <ol class="rules">
+        <li>கீழே உள்ள வரிசைப்படி, ஒவ்வொருவரும் ரகசிய வார்த்தையைப் பற்றி ஒரு சிறு குறிப்பு சொல்லுங்கள்.</li>
+        <li>வார்த்தையை நேரடியாகச் சொல்லக்கூடாது. மிகத் தெளிவான குறிப்பு இம்போஸ்டருக்கு உதவும்!</li>
+        <li>இரண்டு மூன்று சுற்றுகளுக்குப் பிறகு, இம்போஸ்டர் யார் என்று விவாதித்து வாக்களியுங்கள்.</li>
+      </ol>
+    </div>
+
+    <div class="panel">
+      <h2>குறிப்பு சொல்லும் வரிசை</h2>
+      <p class="hint" id="discuss-cat"></p>
+      <ol class="order" id="order"></ol>
+    </div>
+
+    <button class="btn primary" id="to-vote-btn" type="button">வாக்களிக்கச் செல்</button>
+  </section>
+
+  <!-- ================= VOTE ================= -->
+  <section class="screen" id="screen-vote">
+    <div class="topbar">
+      <button class="icon-btn" id="vote-back" type="button" aria-label="விவாதத்திற்குத் திரும்பு">‹</button>
+      <button class="icon-btn quit-btn" type="button" aria-label="ஆட்டத்தை நிறுத்து">✕</button>
+    </div>
+    <div class="stage-title">
+      <span class="big-emoji" aria-hidden="true">🗳️</span>
+      <h2>வாக்கெடுப்பு</h2>
+      <p id="vote-instr"></p>
+    </div>
+    <div class="panel">
+      <div class="vote-grid" id="vote-grid" role="group" aria-labelledby="vote-instr"></div>
+    </div>
+    <p class="last-chance" id="vote-rule"></p>
+    <button class="btn primary" id="vote-submit" type="button" disabled>முடிவைக் காட்டு</button>
+    <button class="link-btn" id="vote-skip" type="button">வாக்களிக்காமல் முடிவைக் காட்டு</button>
+  </section>
+
+  <!-- ================= RESULT (built only when opened) ================= -->
+  <section class="screen" id="screen-result">
+    <div id="result-body"></div>
+    <button class="btn primary" id="again-btn" type="button">அடுத்த சுற்று</button>
+    <button class="btn" id="settings-btn" type="button">அமைப்புகளை மாற்று</button>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ======================================================================
+     WORD COLLECTIONS (all local, all Tamil)
+     ====================================================================== */
+  var CATEGORIES = [
+    { key: "objects", name: "பொருட்கள்", emoji: "📦", words: [
+      "நாற்காலி", "மேசை", "கைப்பேசி", "புத்தகம்", "கடிகாரம்", "கண்ணாடி", "குடை", "பை",
+      "சீப்பு", "தலையணை", "போர்வை", "மின்விசிறி", "விளக்கு", "சாவி", "பேனா", "கத்தரிக்கோல்",
+      "வாளி", "கட்டில்", "தொலைக்காட்சி", "குளிர்சாதனப் பெட்டி", "அலமாரி", "செருப்பு", "கயிறு",
+      "தட்டு", "மெழுகுவர்த்தி", "தீப்பெட்டி", "பணப்பை", "தொப்பி", "சோப்பு", "துடைப்பம்",
+      "பாய்", "அம்மிக்கல்", "ஏணி", "பூட்டு"
+    ]},
+    { key: "fruits", name: "பழங்கள்", emoji: "🥭", words: [
+      "மாம்பழம்", "வாழைப்பழம்", "ஆப்பிள்", "திராட்சை", "தர்பூசணி", "கொய்யாப்பழம்", "மாதுளை",
+      "பலாப்பழம்", "ஆரஞ்சு", "அன்னாசிப்பழம்", "பப்பாளி", "சப்போட்டா", "எலுமிச்சை", "நெல்லிக்காய்",
+      "சீத்தாப்பழம்", "இலந்தைப்பழம்", "நாவல்பழம்", "ஸ்ட்ராபெர்ரி", "கிர்ணிப்பழம்", "பேரிக்காய்",
+      "தேங்காய்", "பேரீச்சம்பழம்", "கிவி", "செர்ரி", "நுங்கு", "சாத்துக்குடி"
+    ]},
+    { key: "animals", name: "விலங்குகள்", emoji: "🐘", words: [
+      "யானை", "சிங்கம்", "புலி", "நாய்", "பூனை", "குரங்கு", "ஒட்டகச்சிவிங்கி", "குதிரை", "பசு",
+      "எருமை", "ஆடு", "கரடி", "மான்", "முயல்", "ஓநாய்", "நரி", "ஒட்டகம்", "வரிக்குதிரை",
+      "காண்டாமிருகம்", "நீர்யானை", "அணில்", "எலி", "பாம்பு", "முதலை", "ஆமை", "கங்காரு",
+      "பன்றி", "சிறுத்தை", "கழுதை", "தவளை", "கீரி", "வௌவால்"
+    ]},
+    { key: "birds", name: "பறவைகள்", emoji: "🦚", words: [
+      "காகம்", "கிளி", "மயில்", "புறா", "கோழி", "சேவல்", "வாத்து", "கழுகு", "ஆந்தை", "குருவி",
+      "மைனா", "குயில்", "கொக்கு", "நாரை", "அன்னம்", "மரங்கொத்தி", "பருந்து", "தீக்கோழி",
+      "பென்குயின்", "மீன்கொத்தி", "வான்கோழி", "காடை", "கருடன்", "தூக்கணாங்குருவி"
+    ]},
+    { key: "vegetables", name: "காய்கறிகள்", emoji: "🍆", words: [
+      "கத்தரிக்காய்", "வெண்டைக்காய்", "தக்காளி", "உருளைக்கிழங்கு", "வெங்காயம்", "கேரட்", "பீட்ரூட்",
+      "முருங்கைக்காய்", "பாகற்காய்", "புடலங்காய்", "சுரைக்காய்", "பூசணிக்காய்", "முட்டைக்கோஸ்",
+      "காலிஃபிளவர்", "பீன்ஸ்", "அவரைக்காய்", "கொத்தவரங்காய்", "முள்ளங்கி", "வாழைக்காய்",
+      "சேனைக்கிழங்கு", "பச்சை மிளகாய்", "இஞ்சி", "பூண்டு", "வெள்ளரிக்காய்", "குடைமிளகாய்",
+      "சேப்பங்கிழங்கு", "கீரை"
+    ]},
+    { key: "foods", name: "உணவுகள்", emoji: "🍛", words: [
+      "இட்லி", "தோசை", "பொங்கல்", "வடை", "சாம்பார்", "ரசம்", "பிரியாணி", "பரோட்டா", "சப்பாத்தி",
+      "பூரி", "உப்புமா", "கேசரி", "பாயசம்", "லட்டு", "ஜிலேபி", "முறுக்கு", "அதிரசம்",
+      "கொத்து பரோட்டா", "தயிர் சாதம்", "புளியோதரை", "பணியாரம்", "ஆப்பம்", "இடியாப்பம்", "அப்பளம்",
+      "சமோசா", "பஜ்ஜி", "மைசூர்பாக்", "அல்வா", "ஐஸ்கிரீம்", "சுண்டல்", "கொழுக்கட்டை"
+    ]},
+    { key: "movies", name: "திரைப்படங்கள்", emoji: "🎬", words: [
+      "நாயகன்", "தளபதி", "பாட்ஷா", "முத்து", "படையப்பா", "சந்திரமுகி", "சிவாஜி", "எந்திரன்",
+      "அந்நியன்", "இந்தியன்", "ரோஜா", "பம்பாய்", "கில்லி", "போக்கிரி", "துப்பாக்கி", "கத்தி",
+      "மெர்சல்", "மாஸ்டர்", "லியோ", "பில்லா", "மங்காத்தா", "விஸ்வரூபம்", "விக்ரம்", "கைதி",
+      "ஜெயிலர்", "அசுரன்", "ஆடுகளம்", "பருத்திவீரன்", "சூரரைப் போற்று", "கஜினி", "வாரணம் ஆயிரம்",
+      "விண்ணைத்தாண்டி வருவாயா", "பொன்னியின் செல்வன்", "அன்பே சிவம்", "தேவர் மகன்", "அலைபாயுதே",
+      "காக்க காக்க", "சுப்பிரமணியபுரம்", "வேட்டையாடு விளையாடு"
+    ]},
+    { key: "places", name: "இடங்கள்", emoji: "🏛️", words: [
+      "பள்ளிக்கூடம்", "மருத்துவமனை", "கோயில்", "கடற்கரை", "ரயில் நிலையம்", "பேருந்து நிலையம்",
+      "விமான நிலையம்", "திரையரங்கம்", "சந்தை", "நூலகம்", "பூங்கா", "உணவகம்", "வங்கி",
+      "காவல் நிலையம்", "அஞ்சல் அலுவலகம்", "கல்லூரி", "மிருகக்காட்சிசாலை", "சமையலறை",
+      "திருமண மண்டபம்", "நீச்சல் குளம்", "அருங்காட்சியகம்", "வணிக வளாகம்", "தேநீர்க் கடை",
+      "சலூன்", "பெட்ரோல் பங்க்", "கிரிக்கெட் மைதானம்"
+    ]},
+    { key: "cities", name: "ஊர்கள்", emoji: "🗺️", words: [
+      "சென்னை", "மதுரை", "கோயம்புத்தூர்", "திருச்சி", "சேலம்", "திருநெல்வேலி", "கன்னியாகுமரி",
+      "ஊட்டி", "கொடைக்கானல்", "தஞ்சாவூர்", "ராமேஸ்வரம்", "காஞ்சிபுரம்", "வேலூர்", "புதுச்சேரி",
+      "ஈரோடு", "திருப்பூர்", "தூத்துக்குடி", "மகாபலிபுரம்", "கும்பகோணம்", "திண்டுக்கல்",
+      "சிதம்பரம்", "பழனி", "திருவண்ணாமலை", "காரைக்குடி", "நாகர்கோவில்", "ஏற்காடு"
+    ]},
+    { key: "jobs", name: "தொழில்கள்", emoji: "🧑‍🍳", words: [
+      "ஆசிரியர்", "மருத்துவர்", "செவிலியர்", "காவலர்", "விவசாயி", "ஓட்டுநர்", "சமையல்காரர்",
+      "தையல்காரர்", "மீனவர்", "தச்சர்", "கொத்தனார்", "பொறியாளர்", "வழக்கறிஞர்", "நீதிபதி",
+      "விமானி", "நடிகர்", "பாடகர்", "எழுத்தாளர்", "புகைப்படக் கலைஞர்", "முடிதிருத்துபவர்",
+      "தபால்காரர்", "குயவர்", "கடைக்காரர்", "ராணுவ வீரர்", "தீயணைப்பு வீரர்", "நடத்துநர்",
+      "பூசாரி", "எலக்ட்ரீஷியன்"
+    ]},
+    { key: "sports", name: "விளையாட்டுகள்", emoji: "🏏", words: [
+      "கிரிக்கெட்", "கால்பந்து", "கபடி", "சதுரங்கம்", "கேரம்", "கைப்பந்து", "கூடைப்பந்து",
+      "டென்னிஸ்", "பூப்பந்து", "நீச்சல்", "ஓட்டப்பந்தயம்", "கோ-கோ", "பல்லாங்குழி", "கிட்டிப்புள்",
+      "பம்பரம்", "கோலிக்குண்டு", "கண்ணாமூச்சி", "ஹாக்கி", "குத்துச்சண்டை", "மல்யுத்தம்",
+      "சிலம்பம்", "ஜல்லிக்கட்டு", "தாயம்", "பட்டம் விடுதல்", "யோகா", "உயரம் தாண்டுதல்",
+      "பாண்டி", "டேபிள் டென்னிஸ்"
+    ]},
+    { key: "vehicles", name: "வாகனங்கள்", emoji: "🛺", words: [
+      "கார்", "பேருந்து", "லாரி", "ஆட்டோ", "ரயில்", "விமானம்", "கப்பல்", "படகு", "ஹெலிகாப்டர்",
+      "மிதிவண்டி", "மோட்டார் சைக்கிள்", "மாட்டு வண்டி", "குதிரை வண்டி", "டிராக்டர்", "ஆம்புலன்ஸ்",
+      "தீயணைப்பு வண்டி", "ஜேசிபி", "ஸ்கூட்டர்", "ராக்கெட்", "நீர்மூழ்கிக் கப்பல்", "மெட்ரோ ரயில்",
+      "சைக்கிள் ரிக்ஷா", "ஜீப்", "கட்டுமரம்"
+    ]},
+    { key: "music", name: "இசைக்கருவிகள்", emoji: "🥁", words: [
+      "வீணை", "மிருதங்கம்", "நாதஸ்வரம்", "தவில்", "புல்லாங்குழல்", "வயலின்", "கிட்டார்", "பியானோ",
+      "தபேலா", "பறை", "உடுக்கை", "கடம்", "ஹார்மோனியம்", "டிரம்ஸ்", "சங்கு", "மணி", "கஞ்சிரா",
+      "சாக்ஸபோன்", "கீபோர்டு", "உறுமி"
+    ]}
+  ];
+  var MIXED = { key: "mixed", name: "கலவை (எல்லா வகைகளும்)", emoji: "🎲" };
+
+  var MIN_PLAYERS = 3, MAX_PLAYERS = 10, TWO_IMPOSTER_MIN = 5;
+  var TAP_GUARD_MS = 450;
+  var STORE_KEY = "tamil-imposter-v1";
+
+  /* ======================================================================
+     HELPERS
+     ====================================================================== */
+  function $(id) { return document.getElementById(id); }
+
+  // Unbiased random integer in [0, n)
+  function randInt(n) {
+    var c = window.crypto || window.msCrypto;
+    if (c && c.getRandomValues) {
+      var buf = new Uint32Array(1);
+      var limit = Math.floor(0x100000000 / n) * n;
+      do { c.getRandomValues(buf); } while (buf[0] >= limit);
+      return buf[0] % n;
+    }
+    return Math.floor(Math.random() * n);
+  }
+  function shuffle(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = randInt(i + 1), t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+  function categoryByKey(key) {
+    for (var i = 0; i < CATEGORIES.length; i++) if (CATEGORIES[i].key === key) return CATEGORIES[i];
+    return null;
+  }
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  // Shrink big text until its longest word fits on one line (never split a Tamil word).
+  function fitText(node, max, min) {
+    var size = max;
+    node.style.fontSize = size + "px";
+    while (size > min && node.scrollWidth > node.clientWidth + 1) {
+      size -= 2;
+      node.style.fontSize = size + "px";
+    }
+  }
+
+  var storage = {
+    load: function () {
+      try { return JSON.parse(window.localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+    },
+    save: function (obj) {
+      try { window.localStorage.setItem(STORE_KEY, JSON.stringify(obj)); } catch (e) { /* private mode etc. */ }
+    }
+  };
+
+  // Ignore taps for a moment after every screen change, so a double-tap can't skip ahead.
+  var lockUntil = 0;
+  function lockTaps(ms) { lockUntil = Date.now() + (ms || TAP_GUARD_MS); }
+  function guarded(fn) {
+    return function (ev) {
+      if (Date.now() < lockUntil) { if (ev) ev.preventDefault(); return; }
+      fn(ev);
+    };
+  }
+
+  /* ======================================================================
+     STATE
+     ====================================================================== */
+  var saved = storage.load();
+  var settings = {
+    count: clamp(parseInt(saved.count, 10) || 5, MIN_PLAYERS, MAX_PLAYERS),
+    names: Array.isArray(saved.names) ? saved.names.slice(0, MAX_PLAYERS).map(String) : [],
+    category: (saved.category === MIXED.key || categoryByKey(saved.category)) ? saved.category : "objects",
+    imposters: saved.imposters === 2 ? 2 : 1
+  };
+  var usedWords = Array.isArray(saved.used) ? saved.used : [];
+  var game = null; // { players, word, wordCat, impSet, current, order, votes, phase }
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function persist() {
+    storage.save({
+      count: settings.count, names: settings.names, category: settings.category,
+      imposters: settings.imposters, used: usedWords.slice(-300)
+    });
+  }
+
+  /* ======================================================================
+     SCREENS
+     ====================================================================== */
+  var PRIVATE_SCREENS = { handoff: true, reveal: true };
+  function show(name) {
+    var screens = document.querySelectorAll(".screen");
+    for (var i = 0; i < screens.length; i++) screens[i].classList.remove("active");
+    $("screen-" + name).classList.add("active");
+    document.body.classList.toggle("private", !!PRIVATE_SCREENS[name]);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", PRIVATE_SCREENS[name] ? "#221338" : "#F7B32B");
+    window.scrollTo(0, 0);
+    lockTaps();
+  }
+
+  /* ======================================================================
+     SETUP SCREEN
+     ====================================================================== */
+  var impNoteMsg = "";
+
+  function renderSetup() {
+    $("count-value").textContent = settings.count;
+    $("count-minus").disabled = settings.count <= MIN_PLAYERS;
+    $("count-plus").disabled = settings.count >= MAX_PLAYERS;
+    renderNames();
+    renderChips();
+    renderImposters();
+  }
+
+  function renderNames() {
+    var wrap = $("names");
+    // Keep what was already typed
+    var inputs = wrap.querySelectorAll("input");
+    for (var i = 0; i < inputs.length; i++) settings.names[i] = inputs[i].value;
+    wrap.textContent = "";
+    for (var n = 0; n < settings.count; n++) {
+      var row = el("div", "name-row");
+      var id = "name-" + n;
+      var lab = el("label", null, String(n + 1));
+      lab.htmlFor = id;
+      var inp = document.createElement("input");
+      inp.type = "text";
+      inp.id = id;
+      inp.maxLength = 18;
+      inp.autocomplete = "off";
+      inp.setAttribute("autocapitalize", "words");
+      inp.placeholder = "வீரர் " + (n + 1);
+      inp.setAttribute("aria-label", "வீரர் " + (n + 1) + " பெயர்");
+      inp.value = settings.names[n] || "";
+      inp.enterKeyHint = n < settings.count - 1 ? "next" : "done";
+      inp.addEventListener("input", onNameInput);
+      inp.addEventListener("keydown", onNameKey);
+      row.appendChild(lab);
+      row.appendChild(inp);
+      wrap.appendChild(row);
+    }
+  }
+  function onNameInput(e) {
+    var idx = parseInt(e.target.id.split("-")[1], 10);
+    settings.names[idx] = e.target.value;
+    e.target.classList.remove("invalid");
+    $("setup-error").textContent = "";
+    persist();
+  }
+  function onNameKey(e) {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    var idx = parseInt(e.target.id.split("-")[1], 10);
+    var next = $("name-" + (idx + 1));
+    if (next) next.focus(); else e.target.blur();
+  }
+
+  function renderChips() {
+    var wrap = $("chips");
+    wrap.textContent = "";
+    CATEGORIES.concat([MIXED]).forEach(function (c) {
+      var b = el("button", "chip" + (c.key === MIXED.key ? " mixed" : ""));
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(settings.category === c.key));
+      b.appendChild(el("span", "emoji", c.emoji)).setAttribute("aria-hidden", "true");
+      b.appendChild(el("span", "fit", c.name));
+      b.addEventListener("click", function () {
+        settings.category = c.key;
+        persist();
+        renderChips();
+      });
+      wrap.appendChild(b);
+    });
+    fitLabels();
+  }
+
+  // Shrink setup labels that would otherwise overflow narrow phones (Tamil words must not be split).
+  function fitLabels() {
+    var labels = document.querySelectorAll("#screen-setup .fit");
+    for (var i = 0; i < labels.length; i++) {
+      var n = labels[i];
+      if (n.closest(".mixed")) continue;
+      n.style.fontSize = "";
+      if (!n.clientWidth) continue; // not laid out (screen hidden)
+      var size = parseFloat(getComputedStyle(n).fontSize);
+      while (size > 11 && n.scrollWidth > n.clientWidth + 1) {
+        size -= 0.5;
+        n.style.fontSize = size + "px";
+      }
+    }
+  }
+
+  function renderImposters() {
+    var allowTwo = settings.count >= TWO_IMPOSTER_MIN;
+    if (!allowTwo && settings.imposters === 2) {
+      settings.imposters = 1;
+      impNoteMsg = "வீரர்கள் " + TWO_IMPOSTER_MIN + "-க்குக் குறைவாக உள்ளதால், 1 இம்போஸ்டராக மாற்றப்பட்டது.";
+      persist();
+    }
+    $("imp-1").setAttribute("aria-pressed", String(settings.imposters === 1));
+    $("imp-2").setAttribute("aria-pressed", String(settings.imposters === 2));
+    $("imp-2").disabled = !allowTwo;
+    var note = impNoteMsg || (!allowTwo ? "2 இம்போஸ்டர்களுக்குக் குறைந்தது " + TWO_IMPOSTER_MIN + " வீரர்கள் தேவை." : "");
+    $("imp-note").textContent = note;
+  }
+
+  function changeCount(delta) {
+    var inputs = $("names").querySelectorAll("input");
+    for (var i = 0; i < inputs.length; i++) settings.names[i] = inputs[i].value;
+    settings.count = clamp(settings.count + delta, MIN_PLAYERS, MAX_PLAYERS);
+    impNoteMsg = "";
+    $("setup-error").textContent = "";
+    persist();
+    renderSetup();
+  }
+
+  function collectPlayers() {
+    var inputs = $("names").querySelectorAll("input");
+    var players = [], seen = {}, dupes = [];
+    for (var i = 0; i < inputs.length; i++) {
+      inputs[i].classList.remove("invalid");
+      var name = inputs[i].value.replace(/\s+/g, " ").trim() || ("வீரர் " + (i + 1));
+      var k = name.toLowerCase();
+      if (seen[k] != null) {
+        dupes.push(name);
+        inputs[i].classList.add("invalid");
+        inputs[seen[k]].classList.add("invalid");
+      } else {
+        seen[k] = i;
+      }
+      players.push(name);
+    }
+    if (dupes.length) {
+      $("setup-error").textContent = "“" + dupes[0] + "” என்ற பெயர் ஒன்றுக்கு மேல் உள்ளது. ஒவ்வொருவருக்கும் வெவ்வேறு பெயர் கொடுங்கள்.";
+      $("setup-error").scrollIntoView({ behavior: "smooth", block: "center" });
+      return null;
+    }
+    return players;
+  }
+
+  /* ======================================================================
+     GAME LOGIC
+     ====================================================================== */
+  function pickWord(catKey) {
+    var pool = [];
+    var cats = catKey === MIXED.key ? CATEGORIES : [categoryByKey(catKey)];
+    cats.forEach(function (c) {
+      c.words.forEach(function (w) { pool.push({ cat: c, word: w, id: c.key + "|" + w }); });
+    });
+    var usedSet = {};
+    usedWords.forEach(function (u) { usedSet[u] = true; });
+    var fresh = pool.filter(function (p) { return !usedSet[p.id]; });
+    if (!fresh.length) {
+      // Every word in this pool has been played: start the pool over.
+      var poolIds = {};
+      pool.forEach(function (p) { poolIds[p.id] = true; });
+      usedWords = usedWords.filter(function (u) { return !poolIds[u]; });
+      fresh = pool;
+    }
+    var choice = fresh[randInt(fresh.length)];
+    usedWords.push(choice.id);
+    persist();
+    return choice;
+  }
+
+  function newGame(players) {
+    var n = players.length;
+    var impCount = Math.min(settings.imposters, n >= TWO_IMPOSTER_MIN ? 2 : 1, n - 1);
+    var idx = shuffle(players.map(function (_, i) { return i; }));
+    var impSet = {};
+    idx.slice(0, impCount).forEach(function (i) { impSet[i] = true; });
+
+    var choice = pickWord(settings.category);
+    var start = randInt(n);
+    var order = [];
+    for (var k = 0; k < n; k++) order.push((start + k) % n);
+
+    game = {
+      players: players.slice(),
+      impCount: impCount,
+      impSet: impSet,
+      word: choice.word,
+      wordCat: choice.cat,
+      current: 0,
+      order: order,
+      votes: [],
+      phase: "reveal"
+    };
+    clearResult();
+    goHandoff();
+  }
+
+  function isImposter(i) { return !!game.impSet[i]; }
+
+  /* ---------- Handoff & reveal ---------- */
+  function renderProgress(container) {
+    container.textContent = "";
+    for (var i = 0; i < game.players.length; i++) {
+      container.appendChild(el("i", i < game.current ? "done" : (i === game.current ? "now" : "")));
+    }
+  }
+
+  function goHandoff() {
+    var name = game.players[game.current];
+    renderProgress($("handoff-progress"));
+    $("handoff-name").textContent = name;
+    $("handoff-btn").textContent = "நான் தான் " + name;
+    $("handoff-done").textContent = game.current > 0
+      ? "✓ " + game.players[game.current - 1] + "-இன் வார்த்தை மறைக்கப்பட்டது"
+      : "";
+    show("handoff");
+  }
+
+  function goReveal() {
+    renderProgress($("reveal-progress"));
+    $("reveal-name").textContent = game.players[game.current];
+    coverCard();
+    show("reveal");
+  }
+
+  function coverCard() {
+    var card = $("card");
+    card.className = "card covered";
+    card.textContent = ""; // removes the word from the page entirely
+    var q = el("div", "q", "?");
+    q.setAttribute("aria-hidden", "true");
+    card.appendChild(q);
+    card.appendChild(el("p", null, "யாரும் பார்க்கவில்லை என்பதை உறுதி செய்துகொண்டு, கீழே உள்ள பொத்தானை அழுத்துங்கள்."));
+    $("show-btn").hidden = false;
+    $("hide-btn").hidden = true;
+  }
+
+  function showWord() {
+    var i = game.current;
+    var card = $("card");
+    card.textContent = "";
+    if (isImposter(i)) {
+      card.className = "card imposter flip";
+      card.appendChild(el("div", "mask", "🕵️")).setAttribute("aria-hidden", "true");
+      var impTitle = card.appendChild(el("div", "word", "நீங்கள் இம்போஸ்டர்!"));
+      card.appendChild(el("span", "badge", "வகை: " + game.wordCat.name));
+      card.appendChild(el("p", "tip",
+        "உங்களுக்கு ரகசிய வார்த்தை தெரியாது. மற்றவர்களின் குறிப்புகளைக் கவனித்து, சந்தேகம் வராமல் நடியுங்கள்!"));
+    } else {
+      card.className = "card normal flip";
+      card.appendChild(el("p", "small", "உங்கள் ரகசிய வார்த்தை"));
+      var wordEl = card.appendChild(el("div", "word", game.word));
+      card.appendChild(el("span", "badge", "வகை: " + game.wordCat.name));
+      card.appendChild(el("p", "tip", "வார்த்தையை நேரடியாகச் சொல்லாமல் குறிப்பு கொடுங்கள்."));
+    }
+    if (impTitle) fitText(impTitle, 48, 24);
+    if (wordEl) fitText(wordEl, 60, 22);
+    $("show-btn").hidden = true;
+    $("hide-btn").hidden = false;
+    lockTaps();
+    $("hide-btn").focus({ preventScroll: true });
+  }
+
+  function hideWord() {
+    coverCard(); // wipe the word from the DOM before anything else
+    game.current++;
+    if (game.current < game.players.length) goHandoff();
+    else goDiscuss();
+  }
+
+  /* ---------- Discussion ---------- */
+  function goDiscuss() {
+    game.phase = "discuss";
+    $("card").textContent = "";
+    $("discuss-cat").textContent = "வகை: " + game.wordCat.name;
+    var list = $("order");
+    list.textContent = "";
+    game.order.forEach(function (pi, pos) {
+      var li = el("li", pos === 0 ? "first" : "");
+      li.appendChild(el("b", null, String(pos + 1)));
+      li.appendChild(el("span", null, game.players[pi]));
+      if (pos === 0) li.appendChild(el("small", null, "முதலில் நீங்கள்!"));
+      list.appendChild(li);
+    });
+    show("discuss");
+  }
+
+  /* ---------- Vote ---------- */
+  function goVote() {
+    game.phase = "vote";
+    var n = game.impCount;
+    $("vote-instr").textContent = n === 1
+      ? "அதிக வாக்குகள் பெற்றவரைத் தேர்ந்தெடுக்கவும்."
+      : "அதிக வாக்குகள் பெற்ற இருவரைத் தேர்ந்தெடுக்கவும்.";
+    $("vote-rule").textContent = n === 1
+      ? "முடிவைக் காட்டும் முன்: தேர்ந்தெடுக்கப்பட்டவர் இம்போஸ்டர் என்றால், அவர் ரகசிய வார்த்தையை ஒருமுறை ஊகிக்கலாம். சரியாக ஊகித்தால் இம்போஸ்டருக்கே வெற்றி!"
+      : "முடிவைக் காட்டும் முன்: தேர்ந்தெடுக்கப்பட்டவர்களில் இம்போஸ்டர் இருந்தால், அவர் ரகசிய வார்த்தையை ஒருமுறை ஊகிக்கலாம். சரியாக ஊகித்தால் இம்போஸ்டர்களுக்கே வெற்றி!";
+    renderVotes();
+    show("vote");
+  }
+
+  function renderVotes() {
+    var grid = $("vote-grid");
+    grid.textContent = "";
+    game.players.forEach(function (name, i) {
+      var b = el("button", "vote-btn", name);
+      b.type = "button";
+      b.setAttribute("aria-pressed", String(game.votes.indexOf(i) !== -1));
+      b.addEventListener("click", function () { toggleVote(i); });
+      grid.appendChild(b);
+    });
+    $("vote-submit").disabled = game.votes.length !== game.impCount;
+  }
+
+  function toggleVote(i) {
+    var at = game.votes.indexOf(i);
+    if (at !== -1) game.votes.splice(at, 1);
+    else {
+      game.votes.push(i);
+      if (game.votes.length > game.impCount) game.votes.shift();
+    }
+    renderVotes();
+  }
+
+  /* ---------- Result (built only now, so the word never sits in the page earlier) ---------- */
+  function clearResult() { $("result-body").textContent = ""; }
+
+  function goResult(skippedVote) {
+    game.phase = "result";
+    var body = $("result-body");
+    body.textContent = "";
+    var n = game.impCount;
+    var caught = 0;
+    game.votes.forEach(function (v) { if (isImposter(v)) caught++; });
+
+    var cls, emoji, title, sub;
+    if (skippedVote) {
+      cls = "neutral"; emoji = "🎭"; title = "உண்மை வெளிவந்தது!";
+      sub = "யார் இம்போஸ்டர் என்று இதோ பாருங்கள்.";
+    } else if (caught === n) {
+      cls = "crew"; emoji = "🎉"; title = "மக்கள் வென்றனர்!";
+      sub = n === 1 ? "இம்போஸ்டர் பிடிபட்டார்!" : "இரண்டு இம்போஸ்டர்களும் பிடிபட்டனர்!";
+    } else if (caught > 0) {
+      cls = "imp"; emoji = "😈"; title = "ஒருவர் தப்பிவிட்டார்!";
+      sub = "ஒரு இம்போஸ்டர் மட்டுமே பிடிபட்டார். தப்பியவருக்கே வெற்றி!";
+    } else {
+      cls = "imp"; emoji = "😈"; title = n === 1 ? "இம்போஸ்டர் வென்றார்!" : "இம்போஸ்டர்கள் வென்றனர்!";
+      sub = n === 1 ? "நீங்கள் தவறான நபரைத் தேர்ந்தெடுத்தீர்கள்." : "நீங்கள் தேர்ந்தெடுத்தவர்கள் இம்போஸ்டர்கள் அல்ல.";
+    }
+
+    var hero = el("div", "result-hero " + cls);
+    hero.appendChild(el("span", "big-emoji", emoji)).setAttribute("aria-hidden", "true");
+    hero.appendChild(el("h2", null, title));
+    hero.appendChild(el("p", null, sub));
+    body.appendChild(hero);
+
+    if (!skippedVote && caught > 0) {
+      body.appendChild(el("p", "last-chance",
+        "பிடிபட்ட இம்போஸ்டர் ரகசிய வார்த்தையைச் சரியாக ஊகித்திருந்தால், வெற்றி இம்போஸ்டருக்கே!"));
+    }
+
+    var panel = el("div", "panel");
+    var r1 = el("div", "reveal-row");
+    r1.appendChild(el("p", "label", "ரகசிய வார்த்தை"));
+    var secretEl = r1.appendChild(el("div", "secret", game.word));
+    r1.appendChild(el("div", "cat", "வகை: " + game.wordCat.name));
+    panel.appendChild(r1);
+    panel.appendChild(el("div", "divider"));
+
+    var r2 = el("div", "reveal-row");
+    r2.appendChild(el("p", "label", n === 1 ? "இம்போஸ்டர்" : "இம்போஸ்டர்கள்"));
+    var list = el("div", "imp-list");
+    game.players.forEach(function (name, i) { if (isImposter(i)) list.appendChild(el("span", null, "🕵️ " + name)); });
+    r2.appendChild(list);
+    panel.appendChild(r2);
+
+    if (!skippedVote) {
+      panel.appendChild(el("div", "divider"));
+      var names = game.votes.map(function (v) { return game.players[v] + (isImposter(v) ? " ✓" : " ✗"); });
+      panel.appendChild(el("p", "vote-summary", "நீங்கள் தேர்ந்தெடுத்தது: " + names.join(", ")));
+    }
+    body.appendChild(panel);
+    show("result");
+    fitText(secretEl, 52, 22);
+  }
+
+  function quitToSetup() {
+    game = null;
+    clearResult();
+    $("card").textContent = "";
+    show("setup");
+    renderSetup();
+  }
+
+  /* ======================================================================
+     EVENTS
+     ====================================================================== */
+  $("count-minus").addEventListener("click", function () { changeCount(-1); });
+  $("count-plus").addEventListener("click", function () { changeCount(1); });
+  $("imp-1").addEventListener("click", function () { settings.imposters = 1; impNoteMsg = ""; persist(); renderImposters(); });
+  $("imp-2").addEventListener("click", function () {
+    if (settings.count < TWO_IMPOSTER_MIN) return;
+    settings.imposters = 2; impNoteMsg = ""; persist(); renderImposters();
+  });
+
+  $("start-btn").addEventListener("click", guarded(function () {
+    var players = collectPlayers();
+    if (!players) return;
+    if (document.activeElement) document.activeElement.blur();
+    newGame(players);
+  }));
+
+  $("handoff-btn").addEventListener("click", guarded(goReveal));
+  $("show-btn").addEventListener("click", guarded(showWord));
+  $("hide-btn").addEventListener("click", guarded(hideWord));
+  $("to-vote-btn").addEventListener("click", guarded(goVote));
+  $("vote-back").addEventListener("click", guarded(function () { show("discuss"); }));
+  $("vote-submit").addEventListener("click", guarded(function () {
+    if (game.votes.length !== game.impCount) return;
+    goResult(false);
+  }));
+  $("vote-skip").addEventListener("click", guarded(function () {
+    if (window.confirm("வாக்களிக்காமலேயே இம்போஸ்டரையும் ரகசிய வார்த்தையையும் காட்டவா?")) goResult(true);
+  }));
+  $("again-btn").addEventListener("click", guarded(function () { newGame(game.players); }));
+  $("settings-btn").addEventListener("click", guarded(quitToSetup));
+
+  var quitBtns = document.querySelectorAll(".quit-btn");
+  for (var q = 0; q < quitBtns.length; q++) {
+    quitBtns[q].addEventListener("click", guarded(function () {
+      if (window.confirm("இந்த ஆட்டத்தை நிறுத்திவிட்டு முதல் பக்கத்திற்குச் செல்லவா?")) quitToSetup();
+    }));
+  }
+
+  // Warn before an accidental refresh / close in the middle of a round.
+  window.addEventListener("beforeunload", function (e) {
+    if (game && game.phase !== "result") { e.preventDefault(); e.returnValue = ""; }
+  });
+
+  renderSetup();
+  window.addEventListener("resize", fitLabels);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitLabels);
+
+  // Small hook for automated testing only; exposes nothing about the current round.
+  window.__imposterMeta = { categories: CATEGORIES.length, words: CATEGORIES.reduce(function (s, c) { return s + c.words.length; }, 0) };
+})();
+</script>
+</body>
+</html>
